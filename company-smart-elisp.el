@@ -31,6 +31,10 @@
 ;; * let* using previous arguments
 ;; * (func) but only when not quoted
 ;; * PARAMETERS in docstrings
+;; * ielm support
+
+;; We should also add a tasteful annotation (signature plus docstring)
+;; and examples in the readme of using F1.
 
 ;;; Code:
 
