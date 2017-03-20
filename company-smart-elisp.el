@@ -38,8 +38,11 @@
 
 ;;; Code:
 
+;; Local testing.
+
 (require 'cl-lib)
-(require 'dash)
+(setq-local company-backends (list #'company-smart-elisp))
+(setq-local company-minimum-prefix-length 2)
 
 ;; TODO: this is a little slow, cache it.
 (defun company-smart-elisp--functions ()
