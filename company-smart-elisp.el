@@ -43,7 +43,9 @@
 
 (require 'cl-lib)
 (setq-local company-backends (list #'company-smart-elisp))
+;; TODO: this doesn't seem to be respected.
 (setq-local company-minimum-prefix-length 2)
+(setq company-minimum-prefix-length 2)
 
 (defvar company-smart-elisp--quoted-fns nil)
 
