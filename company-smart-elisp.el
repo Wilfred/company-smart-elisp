@@ -60,15 +60,18 @@
               obarray))
   (all-completions prefix company-smart-elisp--quoted-fns))
 
+(defun company-smart-elisp--fn-quote-prefix ()
+  (when (looking-back
+         (rx (group "#'" (0+ (or (syntax word) (syntax symbol))))))
+    (match-string 1)))
+
 (defun company-smart-elisp (command &optional arg &rest ignored)
   "Context-aware code completion for Emacs Lisp."
   (interactive (list 'interactive))
   (cl-case command
     (interactive (company-begin-backend #'company-smart-elisp))
     (prefix
-     (when (looking-back
-            (rx (group "#'" (0+ (or (syntax word) (syntax symbol))))))
-       (match-string 1)))
+     (company-smart-elisp--fn-quote-prefix))
     ;; TODO: only require a match for #'.
     (require-match t)
     (candidates
