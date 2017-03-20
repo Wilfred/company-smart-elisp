@@ -44,16 +44,18 @@
 (setq-local company-backends (list #'company-smart-elisp))
 (setq-local company-minimum-prefix-length 2)
 
-;; TODO: this is a little slow, cache it.
-(defun company-smart-elisp--functions ()
-  "Return a list of all functions currently defined."
-  (let (symbols)
-    (mapatoms (lambda (symbol)
-                (when (and (functionp symbol)
-                           ;; TODO: why is #'(setf ...) in the obarray?
-                           (symbolp symbol))
-                  (push symbol symbols))))
-    symbols))
+(defvar company-smart-elisp--quoted-fns nil)
+
+;; TODO: update cache periodically.
+(defun company-smart-elisp--functions (prefix)
+  "Return a list of all function whose name starts with PREFIX."
+  (unless company-smart-elisp--quoted-fns
+    (mapatoms (lambda (sym)
+                (when (functionp sym)
+                  (push (format "#'%s" sym)
+                        company-smart-elisp--quoted-fns)))
+              obarray))
+  (all-completions prefix company-smart-elisp--quoted-fns))
 
 (defun company-smart-elisp (command &optional arg &rest ignored)
   "Context-aware code completion for Emacs Lisp."
@@ -61,10 +63,13 @@
   (cl-case command
     (interactive (company-begin-backend #'company-smart-elisp))
     (prefix
-     (when (looking-back (rx "#'"))
-       "#'"))
+     (when (looking-back
+            (rx (group "#'" (0+ (or (syntax word) (syntax symbol))))))
+       (match-string 1)))
+    ;; TODO: only require a match for #'.
+    (require-match t)
     (candidates
-     (--map (format "#'%s" it) (company-smart-elisp--functions)))))
+     (company-smart-elisp--functions arg))))
 
 (provide 'company-smart-elisp)
 ;;; company-smart-elisp.el ends here
