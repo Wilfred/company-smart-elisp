@@ -30,7 +30,6 @@
 ;; * &optional &rest in params
 ;; * let* using previous arguments
 ;; * (func) but only when not quoted
-;; * #'func
 ;; * PARAMETERS in docstrings
 
 ;;; Code:
