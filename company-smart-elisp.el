@@ -32,6 +32,7 @@
 ;; * (func) but only when not quoted
 ;; * PARAMETERS in docstrings
 ;; * ielm support
+;; * setq and setq-local
 
 ;; We should also add a tasteful annotation (signature plus docstring)
 ;; and examples in the readme of using F1.
