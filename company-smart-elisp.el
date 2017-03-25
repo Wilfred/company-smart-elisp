@@ -26,7 +26,6 @@
 ;;; TODO
 
 ;; * rx
-;; * require
 ;; * &optional &rest in params
 ;; * let* using previous arguments
 ;; * (func) but only when not quoted
@@ -60,10 +59,31 @@
               obarray))
   (all-completions prefix company-smart-elisp--quoted-fns))
 
+(defun company-smart-elisp--libraries (prefix)
+  "Return a list of all libraries we might use with `require'."
+  (let (res)
+    (dolist (dir load-path)
+      (when (file-directory-p dir)
+        (dolist (file (file-name-all-completions prefix dir))
+          (when (or (s-ends-with-p ".el.gz" file)
+                    (s-ends-with-p ".el" file))
+            (let ((filename (s-chop-suffix ".el" (s-chop-suffix ".gz" file))))
+              (unless (or (s-ends-with-p "-pkg" filename)
+                          (s-ends-with-p "-autoloads" filename)
+                          (eq ".dir-locals" filename))
+                (push filename res)))))))
+    res))
+
 (defun company-smart-elisp--fn-quote-prefix ()
   (when (looking-back
          (rx (group "#'" (0+ (or (syntax word) (syntax symbol))))))
     (match-string 1)))
+
+(defun company-smart-elisp--require-prefix ()
+  (interactive)
+  ;; TODO: parse rather than a regexp.
+  (when (looking-back (rx "(require" (+ (not (any ")")))))
+    (match-string 0)))
 
 (defun company-smart-elisp (command &optional arg &rest ignored)
   "Context-aware code completion for Emacs Lisp."
@@ -71,11 +91,23 @@
   (cl-case command
     (interactive (company-begin-backend #'company-smart-elisp))
     (prefix
-     (company-smart-elisp--fn-quote-prefix))
-    ;; TODO: only require a match for #'.
-    (require-match t)
+     (or
+      (company-smart-elisp--fn-quote-prefix)
+      (company-smart-elisp--require-prefix)))
+    ;; TODO: require a match for #'... and (require #'...) but not for
+    ;; (require "...")
+    (require-match nil)
     (candidates
-     (company-smart-elisp--functions arg))))
+     (cond
+      ((s-starts-with-p "#'" arg)
+       (company-smart-elisp--functions arg))
+      ((s-starts-with-p "(require" arg)
+       (--map
+        (format "require '%s" it)
+        (company-smart-elisp--libraries
+         (-last-item
+          (s-match (rx "(require" (? " ") (? "'") (group (* anything)))
+                   arg)))))))))
 
 (provide 'company-smart-elisp)
 ;;; company-smart-elisp.el ends here
