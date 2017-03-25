@@ -55,7 +55,7 @@
 
 ;; TODO: update cache periodically.
 (defun company-smart-elisp--functions (prefix)
-  "Return a list of all function whose name starts with PREFIX."
+  "Return a list of all functions whose name starts with PREFIX."
   (unless company-smart-elisp--quoted-fns
     (mapatoms (lambda (sym)
                 (when (functionp sym)
