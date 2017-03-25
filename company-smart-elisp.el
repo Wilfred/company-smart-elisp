@@ -75,7 +75,7 @@
             (let ((filename (s-chop-suffix ".el" (s-chop-suffix ".gz" file))))
               (unless (or (s-ends-with-p "-pkg" filename)
                           (s-ends-with-p "-autoloads" filename)
-                          (eq ".dir-locals" filename))
+                          (equal ".dir-locals" filename))
                 (push filename res)))))))
     res))
 
