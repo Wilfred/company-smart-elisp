@@ -67,6 +67,10 @@
               obarray))
   (all-completions prefix company-smart-elisp--quoted-fns))
 
+(defun company-smart-elisp--symbols (prefix)
+  "Return a list of bound symbols whose name starts with PREFIX."
+  (all-completions prefix obarray))
+
 (defun company-smart-elisp--libraries (prefix)
   "Return a list of all libraries we might use with `require'."
   (let (res)
@@ -103,6 +107,14 @@
          (looking-back (rx "(require" (+ (not (any ")"))))))
     (match-string 0)))
 
+(defun company-smart-elisp--sexp-prefix ()
+  (interactive)
+  ;; TODO: parse rather than a regexp.
+  (when (and
+         (company-smart-elisp--code-p)
+         (looking-back (rx "(" (* (not (any ")"))))))
+    (match-string 0)))
+
 (defun company-smart-elisp (command &optional arg &rest ignored)
   "Context-aware code completion for Emacs Lisp."
   (interactive (list 'interactive))
@@ -111,7 +123,8 @@
     (prefix
      (or
       (company-smart-elisp--fn-quote-prefix)
-      (company-smart-elisp--require-prefix)))
+      (company-smart-elisp--require-prefix)
+      (company-smart-elisp--sexp-prefix)))
     ;; TODO: require a match for #'... and (require #'...) but not for
     ;; (require "...")
     (require-match nil)
@@ -125,7 +138,12 @@
         (company-smart-elisp--libraries
          (-last-item
           (s-match (rx "(require" (? " ") (? "'") (group (* anything)))
-                   arg)))))))))
+                   arg)))))
+      ((s-starts-with-p "(" arg)
+       (--map
+        (format "(%s" it)
+        (company-smart-elisp--symbols
+         (s-chop-prefix "(" arg))))))))
 
 (provide 'company-smart-elisp)
 ;;; company-smart-elisp.el ends here
