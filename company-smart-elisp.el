@@ -48,6 +48,7 @@
 (require 'dash)
 (require 's)
 (require 'cl-lib)
+(require 'rx)
 
 (setq-local company-backends (list #'company-smart-elisp))
 ;; TODO: this doesn't seem to be respected.
@@ -85,6 +86,11 @@
                           (equal ".dir-locals" filename))
                 (push filename res)))))))
     res))
+
+(defun company-smart-elisp--rx-keywords (prefix)
+  (all-completions
+   prefix
+   (-map #'-first-item rx-constituents)))
 
 (defun company-smart-elisp--code-p ()
   "Return t if point is in code (not a string or comment)."
