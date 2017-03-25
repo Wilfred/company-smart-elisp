@@ -34,7 +34,8 @@
 ;; * PARAMETERS in docstrings
 ;; * ielm support
 ;; * setq and setq-local
-;; * `foo'
+;; * `foo' in strings and comments
+;; * defun/defsubst etc at top level
 
 ;; We should also add a tasteful annotation (signature plus docstring)
 ;; and examples in the readme of using F1.
