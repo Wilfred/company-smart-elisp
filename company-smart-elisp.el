@@ -3,7 +3,9 @@
 ;; Copyright (C) 2017  Wilfred Hughes
 
 ;; Author: Wilfred Hughes <me@wilfred.me.uk>
+;; Version: 0.4
 ;; Keywords: lisp, completion
+;; Package-Requires: ((emacs "24.3") (s "1.11.0") (dash "2.12.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -39,6 +41,9 @@
 ;;; Code:
 
 ;; Local testing.
+
+(require 'dash)
+(require 's)
 
 (require 'cl-lib)
 (setq-local company-backends (list #'company-smart-elisp))
