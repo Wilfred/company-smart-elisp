@@ -79,15 +79,25 @@
                 (push filename res)))))))
     res))
 
+(defun company-smart-elisp--code-p ()
+  "Return t if point is in code (not a string or comment)."
+  (let ((syntax (syntax-ppss)))
+    (and (not (nth 3 syntax))
+         (not (nth 4 syntax)))))
+
 (defun company-smart-elisp--fn-quote-prefix ()
-  (when (looking-back
-         (rx (group "#'" (0+ (or (syntax word) (syntax symbol))))))
+  (when (and
+         (company-smart-elisp--code-p)
+         (looking-back
+          (rx (group "#'" (0+ (or (syntax word) (syntax symbol)))))))
     (match-string 1)))
 
 (defun company-smart-elisp--require-prefix ()
   (interactive)
   ;; TODO: parse rather than a regexp.
-  (when (looking-back (rx "(require" (+ (not (any ")")))))
+  (when (and
+         (company-smart-elisp--code-p)
+         (looking-back (rx "(require" (+ (not (any ")"))))))
     (match-string 0)))
 
 (defun company-smart-elisp (command &optional arg &rest ignored)
