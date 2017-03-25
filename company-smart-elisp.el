@@ -112,7 +112,7 @@
   ;; TODO: parse rather than a regexp.
   (when (and
          (company-smart-elisp--code-p)
-         (looking-back (rx "(" (* (not (any ")"))))))
+         (looking-back (rx "(" (+ (not (any ")"))))))
     (match-string 0)))
 
 (defun company-smart-elisp (command &optional arg &rest ignored)
